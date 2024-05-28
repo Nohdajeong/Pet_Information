@@ -7,7 +7,7 @@ g_Tk = Tk()
 g_Tk.geometry("400x600+750+200")
 DataList = []
 url = "openapi.gg.go.kr"
-query = "/Animalhosptl"
+query = "/Animalhosptl?KEY=f6b11f02849f4b87afcf6b3de2457686&p&Type=xml&pIndex=1&pSize=10&SIGUN_CD="
 
 
 #지역코드

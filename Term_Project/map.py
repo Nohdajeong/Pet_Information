@@ -14,9 +14,9 @@ api_key = "f6b11f02849f4b87afcf6b3de2457686"
 # 경기도 동물병원 정보 데이터
 url = "https://openapi.gg.go.kr/Animalhosptl"
 params = {
-    "serviceKey": api_key,
-    "numOfRows": 350,
-    "sidoCd": 31000
+    "KEY": api_key,
+    "pIndex" : 1,
+    "SIGUN_CD": 41820
 }
 response = requests.get(url, params=params)
 root = ET.fromstring(response.content)
@@ -64,10 +64,16 @@ def show_AnimalHospitals():
     AnimalHospital_list.delete(0, tk.END)
 
     sigun_name = selected_sigun.get()
-    AnimalHospitals_in_sigun = []
+    AnimalHospitals_in_sigun = [AnimalHospital for AnimalHospital in AnimalHospitals if AnimalHospital['address'].split()[1] == sigun_name]
+
+    AnimalHospital_names = [AnimalHospital['name'] for AnimalHospital in AnimalHospitals_in_sigun]
 
     # 캔버스 초기화
     canvas.delete('all')
+
+    # 병원 목록에 추가
+    for AnimalHospital in AnimalHospitals_in_sigun:
+        AnimalHospital_list.insert(tk.END, f"{AnimalHospital['name']}")
 
 # 캔버스 생성
 canvas = tk.Canvas(root, width=800, height=400)
