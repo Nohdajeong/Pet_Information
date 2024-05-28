@@ -7,3 +7,14 @@
 구글맵 : AIzaSyBfFhkb6C0JDDiDK__pRNdeXWAzDOesv40
 
 Gmail(다정) : ztwx dwqk xysi dauv
+
+
+경기도 동물병원 현황 https://www.data.go.kr/data/15057867/openapi.do
+
+경기도 유기동물 보호시설 현황 https://www.data.go.kr/data/15057652/openapi.do
+
+경기도 동물약국 현황 https://www.data.go.kr/data/15059138/openapi.do
+
+경기도 동물용 의약품 도매상 현황 https://www.data.go.kr/data/15056601/openapi.do
+
+경기도 동물용 의료용구 판매업체 현황 https://www.data.go.kr/data/15058268/openapi.do

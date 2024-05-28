@@ -51,3 +51,32 @@ gg_map_url += marker_url
 # tkinter GUI 생성
 root = tk.Tk()
 root.title("경기도 동물병원정보")
+
+# 선택 콤보박스 생성
+selected_sigun = tk.StringVar()
+selected_sigun.set('수원시')
+sigun_options = set([AnimalHospital['address'].split()[1] for AnimalHospital in AnimalHospitals])
+sigun_combo = ttk.Combobox(root, textvariable=selected_sigun, values=list(sigun_options))
+sigun_combo.pack()
+
+# 목록 표시 함수
+def show_AnimalHospitals():
+    AnimalHospital_list.delete(0, tk.END)
+
+    sigun_name = selected_sigun.get()
+    AnimalHospitals_in_sigun = []
+
+    # 캔버스 초기화
+    canvas.delete('all')
+
+# 캔버스 생성
+canvas = tk.Canvas(root, width=800, height=400)
+canvas.pack()
+
+# 병원 목록 리스트 박스
+AnimalHospital_list = tk.Listbox(root, width=60)
+AnimalHospital_list.pack(side=tk.LEFT, fill=tk.BOTH)
+
+# 스크롤바 생성
+scrollbar = tk.Scrollbar(root)
+scrollbar.pack(side=tk.RIGHT, fill=tk.Y)

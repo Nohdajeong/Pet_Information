@@ -1,25 +1,17 @@
 from tkinter import *
 from tkinter import font
 
-'''
-import http.client
-
-conn = http.client.HTTPConnection("openapi.gg.go.kr")
-conn.request("Get", "/Animalhosptl?")
-req = conn.getresponse()
-print(req.status, req.reason)
-print(req.read().decode('utf-8'))
-'''
+#https://openapi.gg.go.kr/Animalhosptl?
 
 g_Tk = Tk()
 g_Tk.geometry("400x600+750+200")
 DataList = []
 url = "openapi.gg.go.kr"
-query = "/Animalhosptl?"
+query = "/Animalhosptl"
 
 
 #지역코드
-SIGUN_CD = [['41110', '수원시']]
+SIGUN_CD = [['41110', '수원시'], ['41820', '가평군']]
 
 def InitTopText():
    TempFont = font.Font(g_Tk, size=20, weight='bold', family='Consolas')
@@ -38,7 +30,7 @@ def InitSearchListBox():
                             width=10, height=5, borderwidth=12, relief='ridge',
                             yscrollcommand=ListBoxScrollbar.set)
 
-    for i in range(1):
+    for i in range(2):
         SearchListBox.insert(i+1, SIGUN_CD[i][1]) #8개 지역 리스트 삽입
 
     SearchListBox.pack()
