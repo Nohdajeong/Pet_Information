@@ -1,10 +1,11 @@
 import datetime
 import tkinter
+import tkinter as tk
 from tkinter import *
 from tkinter import font
 import requests
 import xml.etree.ElementTree as ET
-from datetime import datetime
+import time
 
 g_Tk = Tk()
 g_Tk.title("동물병원정보")
@@ -50,10 +51,15 @@ def InitTopText():
     MainText.pack()
     MainText.place(x=200)
 
+
 def InitNowTime():
-    TempFont = font.Font(g_Tk, size=12, weight='bold', family='Consolas')
-    Time = Label(g_Tk, font=TempFont, text=datetime.now())
-    Time.place(x=500, y=530)
+    TempFont = font.Font(g_Tk, size=15, weight='bold', family='Consolas')
+    current_time = time.strftime('%H:%M:%S')
+    clock_label = Label(g_Tk, font=TempFont, text=current_time)
+    clock_label.after(1000, InitNowTime)
+    clock_label.pack()
+    clock_label.place(x=620, y=530)
+
 
 # 검색 버튼
 def InitSearchButton():
@@ -235,6 +241,14 @@ def TipButtonAction():
 
     RenderText.configure(state='disabled')
 
+def InitMemoButton():
+    TempFont = font.Font(g_Tk, size=20, weight='bold', family='Consolas')
+    MemoButton = Button(g_Tk, font=TempFont, text="메모", command=AniButtonAction)
+    MemoButton.pack()
+    MemoButton.place(x=635, y=150)
+
+
+
 InitTopText()
 
 InitSearchButton()
@@ -249,6 +263,8 @@ InitAniHosplButton()
 InitAniSickButton()
 InitAniProtectButton()
 InitTipButton()
+
 InitNowTime()
+InitMemoButton()
 
 g_Tk.mainloop()
