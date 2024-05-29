@@ -203,16 +203,9 @@ def SearchHospl():
 
         for i, value in enumerate(DataList):
             RenderText.insert(INSERT, "[")
-            RenderText.insert(INSERT, int + 1)
+            RenderText.insert(INSERT, i + 1)
             RenderText.insert(INSERT, "] ")
-            RenderText.insert(INSERT, "병원명: ")
             RenderText.insert(INSERT, value)
-            RenderText.insert(INSERT, "\n")
-            RenderText.insert(INSERT, "주소: ")
-            RenderText.insert(INSERT, DataList[value][1])
-            RenderText.insert(INSERT, "\n")
-            RenderText.insert(INSERT, "상태: ")
-            RenderText.insert(INSERT, DataList[value][2])
             RenderText.insert(INSERT, "\n\n")
 
         row_count += 1
