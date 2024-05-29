@@ -19,7 +19,7 @@ DataList = []
 url = ' https://openapi.gg.go.kr/Animalhosptl'
 
 # 공공데이터포털에서 발급받은 디코딩되지 않은 인증키 입력
-service_key1 = "ZjZiMTFmMDI4NDlmNGI4N2FmY2Y2YjNkZTI0NTc2ODY="
+service_key1 = "35fa560601554d42bbf34c34ff3fbcf8"
 service_key2 = "MzVmYTU2MDYwMTU1NGQ0MmJiZjM0YzM0ZmYzZmJjZjg="
 service_key3 = "YmJkZjFmYTQzNjE2NDE0M2EzNzA0ZmJiMWQ3N2FhOTM="
 service_key4 = "M2IxMTY1OWZlMDllNDU3ZjkzMGE2NWFhMDU2MWRmZGM="
@@ -197,24 +197,26 @@ def SearchHospl():
     for item in root.iter("row"):
         Nm = item.findtext("BIZPLC_NM")
         addr = item.findtext("REFINE_LOTNO_ADDR")
-        telno = item.findtext("LOCPLC_FACLT_TELNO")
-        DataList.append((Nm, addr, telno))
+        State = item.findtext("BSN_STATE_NM")
+
+        DataList.append((Nm, addr, State))
 
         for i, value in enumerate(DataList):
             RenderText.insert(INSERT, "[")
-            RenderText.insert(INSERT, i + 1)
+            RenderText.insert(INSERT, int + 1)
             RenderText.insert(INSERT, "] ")
             RenderText.insert(INSERT, "병원명: ")
-            RenderText.insert(INSERT, DataList[i][0])
+            RenderText.insert(INSERT, value)
             RenderText.insert(INSERT, "\n")
             RenderText.insert(INSERT, "주소: ")
-            RenderText.insert(INSERT, DataList[i][1])
+            RenderText.insert(INSERT, DataList[value][1])
             RenderText.insert(INSERT, "\n")
-            RenderText.insert(INSERT, "전화번호: ")
-            RenderText.insert(INSERT, DataList[i][2])
+            RenderText.insert(INSERT, "상태: ")
+            RenderText.insert(INSERT, DataList[value][2])
             RenderText.insert(INSERT, "\n\n")
 
-    row_count += 1
+        row_count += 1
+
 
 # Tip 버튼
 def InitTipButton():
