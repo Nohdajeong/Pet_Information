@@ -10,10 +10,10 @@ import io
 from googlemaps import Client
 
 # 공공데이터 API 키
-api_key = "bbdf1fa436164143a3704fbb1d77aa93"
+api_key = "c515978432194f9ab9d94db31ae080cf"
 
 # 서울시 구별 병원 정보 데이터
-url = "https://openapi.gg.go.kr/AnimalPharmacy"
+url = "https://openapi.gg.go.kr/AbdmAnimalProtect"
 params = {
     'KEY': api_key,
     'Type': 'xml'
@@ -25,11 +25,11 @@ items = root.findall("row")
 hospitals = []
 for item in items:
     hospital = {
-        'name': item.findtext("BIZPLC_NM"),  # 병원 이름
-        'address': item.findtext("REFINE_LOTNO_ADDR"),  # 병원 주소
-        'lat': item.findtext("X_CRDNT_VL"),  # 위도
-        'lng': item.findtext("Y_CRDNT_VL"),  # 경도
-        'doctors': item.findtext("TOT_EMPLY_CNT"),  # 의사수
+        'name': item.findtext("SPECIES_NM"),  # 보호하고 있는 동물 이름
+        'address': item.findtext("PROTECT_PLC"),  #보호소 주소
+        'lat': item.findtext("REFINE_WGS84_LAT"),  # 위도
+        'lng': item.findtext("REFINE_WGS84_LOGT"),  # 경도
+        'doctors': item.findtext("BDWGH_INFO").strip("(Kg)")  # 몸무게
     }
     hospitals.append(hospital)
 
@@ -56,7 +56,7 @@ root.title("서울시 구별 병원 정보")
 
 # 구 선택 콤보박스 생성
 selected_gu = tk.StringVar()
-selected_gu.set("과천시")  # 초기값 설정
+selected_gu.set("평택시")  # 초기값 설정
 gu_options = set([hospital['address'].split()[1] for hospital in hospitals])
 gu_combo = ttk.Combobox(root, textvariable=selected_gu, values=list(gu_options))
 gu_combo.pack()
@@ -68,12 +68,13 @@ def show_hospitals():
     gu_name = selected_gu.get()
     hospitals_in_gu = [hospital for hospital in hospitals if hospital['address'].split()[1] == gu_name]
 
-    #hospital_names = [hospital['name'] for hospital in hospitals_in_gu]
-    #doctor_counts = [int(hospital['doctors']) for hospital in hospitals_in_gu]
+    hospital_names = [hospital['name'] for hospital in hospitals_in_gu]
+    doctor_counts1 = [float(hospital['doctors']) for hospital in hospitals_in_gu]
+    doctor_counts = [int(float(hospital['doctors'])*100) for hospital in hospitals_in_gu]
 
     # 캔버스 초기화
     canvas.delete('all')
-    """
+
     # 막대그래프 생성
     max_doctor_count = max(doctor_counts)
     bar_width = 20
@@ -85,11 +86,11 @@ def show_hospitals():
         y1 = y0 - 200 * doctor_counts[i] / max_doctor_count
         canvas.create_rectangle(x1, y1, x1 + bar_width, y0, fill='blue')
         canvas.create_text(x1 + bar_width / 2, y0 + 100, text=hospital_names[i], anchor='n', angle=90)
-        canvas.create_text(x1 + bar_width / 2, y1 -10, text=doctor_counts[i], anchor='s')
-    """
+        canvas.create_text(x1 + bar_width / 2, y1 -10, text=doctor_counts1[i], anchor='s')
+
     # 병원 목록에 추가
     for hospital in hospitals_in_gu:
-        hospital_list.insert(tk.END, f"{hospital['name']} ({hospital['doctors']} doctors)")
+        hospital_list.insert(tk.END, f"{hospital['name']} ({hospital['doctors']})kg")
 
 # 캔버스 생성
 canvas = tk.Canvas(root, width=800, height=400)

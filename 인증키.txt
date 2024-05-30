@@ -3,6 +3,8 @@
 동물약국 현황 : bbdf1fa436164143a3704fbb1d77aa93
 동물용 의약품 도매상 : 3b11659fe09e457f930a65aa0561dfdc
 동물용 의료용구 판매업체 : 29eb945b485446deb0048dd19a86428a
+동물등록현황 : 9077ad9cffbb48e0b909b658342ab0e2
+유기동물 보호현황 : c515978432194f9ab9d94db31ae080cf
 
 구글맵 : AIzaSyBfFhkb6C0JDDiDK__pRNdeXWAzDOesv40
 
@@ -18,3 +20,7 @@ Gmail(다정) : ztwx dwqk xysi dauv
 경기도 동물용 의약품 도매상 현황 https://www.data.go.kr/data/15056601/openapi.do
 
 경기도 동물용 의료용구 판매업체 현황 https://www.data.go.kr/data/15058268/openapi.do
+
+경기도 반려동물 등록 현황 https://data.gg.go.kr/portal/data/service/selectServicePage.do?page=1&rows=10&sortColumn=&sortDirection=&infId=KN6C761T9DJ7MUHMH76K30156243&infSeq=1&order=&searchWord=%EB%B0%98%EB%A0%A4%EB%8F%99%EB%AC%BC
+
+경기도 유기동물 보호현황 : https://data.gg.go.kr/portal/data/service/selectServicePage.do?page=1&rows=10&sortColumn=&sortDirection=&infId=UOKOBXSYKT10BAGIDAXZ28522406&infSeq=1&order=&searchWord=%EB%B0%98%EB%A0%A4%EB%8F%99%EB%AC%BC
