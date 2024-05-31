@@ -7,6 +7,8 @@ from PIL import Image, ImageTk
 from googlemaps import Client
 from tkinter import *
 from tkinter import font
+from tkinter import ttk
+from ttkthemes import ThemedTk
 
 class Program:
     def setupButton(self):
@@ -131,7 +133,7 @@ class Program:
         self.g_Tk = ET.fromstring(self.response.content)
         self.items = self.g_Tk.findall("row")
 
-        self.g_Tk = Tk()
+        self.g_Tk = ThemedTk(theme="blue")
         self.g_Tk.title("경기도 유기동물 정보 프로그램")
         self.g_Tk.geometry("800x600+750+200")
 
