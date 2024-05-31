@@ -16,7 +16,18 @@ class Program:
         self.Check.place(x=50, y=500)
 
     def pressedCheck(self):
-        pass
+        self.InitHospitals()
+        self.InitSelected()
+        self.InitListBox()
+
+        self.si_name = self.selected_si.get()
+        self.si_center = self.gmaps.geocode(f"{self.si_name} 시")[0]['geometry']['location']
+        self.si_map_url = f"https://maps.googleapis.com/maps/api/staticmap?center={self.si_center['lat']},{self.si_center['lng']}&zoom=14&size=400x400&maptype=roadmap"
+
+        self.InitMapImage()
+
+        self.si_combo.bind("<<ComboboxSelected>>", self.on_si_select)
+        self.update_map()
 
     def InitMapImage(self):
         self.response = requests.get(self.si_map_url + '&key=' + self.Google_API_Key)
@@ -126,19 +137,6 @@ class Program:
 
         self.Google_API_Key = 'AIzaSyCzFgc9OGnXckq1-JNhSCVGo9zIq1kSWcE'
         self.gmaps = Client(key=self.Google_API_Key)
-
-        self.InitHospitals()
-        self.InitSelected()
-        self.InitListBox()
-
-        self.si_name = self.selected_si.get()
-        self.si_center = self.gmaps.geocode(f"{self.si_name} 시")[0]['geometry']['location']
-        self.si_map_url = f"https://maps.googleapis.com/maps/api/staticmap?center={self.si_center['lat']},{self.si_center['lng']}&zoom=14&size=400x400&maptype=roadmap"
-
-        self.InitMapImage()
-
-        self.si_combo.bind("<<ComboboxSelected>>", self.on_si_select)
-        self.update_map()
 
         self.setupButton()
         self.g_Tk.mainloop()
