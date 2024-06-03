@@ -2,6 +2,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import io
 import requests
+import time
 import xml.etree.ElementTree as ET
 from PIL import Image, ImageTk
 from googlemaps import Client
@@ -11,16 +12,44 @@ from tkinter import ttk
 from ttkthemes import ThemedTk
 
 class Program:
-    def setupButton(self):
+    def setupMainButton(self):
         TempFont = font.Font(self.g_Tk, size=20, weight='bold', family='Consolas')
         self.Check = Button(self.g_Tk, text="Check", width=6, height=1, font=TempFont,
                             command=self.pressedCheck)
         self.Check.place(x=50, y=500)
 
+        self.Home = Button(self.g_Tk, text="Home", width=6, height=1, font=TempFont,
+                           command=self.pressedHome)
+        self.Home.place(x=200, y=500)
+
+    def InitNowTime(self):
+        TempFont = font.Font(self.g_Tk, size=15, weight='bold', family='Consolas')
+        current_time = time.strftime('%H:%M:%S')
+        clock_label = Label(self.g_Tk, font=TempFont, text=current_time)
+        clock_label.after(1000, self.InitNowTime)
+        clock_label.pack()
+        clock_label.place(x=650, y=530)
+
+    def InitMain(self):
+        TempFont = font.Font(self.g_Tk, size=20, weight='bold', family='Consolas')
+        MainText = Label(self.g_Tk, font=TempFont, text="[ 경기도 동물 보호 정보 프로그램 ]")
+        MainText.pack()
+        MainText.place(x=200, y=15)
+        self.setupMainButton()
+        self.InitNowTime()
+
+    def pressedHome(self):
+        self.si_combo.pack_forget()
+        self.canvas.pack_forget()
+        self.hospital_list.pack_forget()
+        self.scrollbar.pack_forget()
+        self.InitMain()
+
     def pressedCheck(self):
         self.InitHospitals()
         self.InitSelected()
         self.InitListBox()
+        self.setupMainButton()
 
         self.si_name = self.selected_si.get()
         self.si_center = self.gmaps.geocode(f"{self.si_name} 시")[0]['geometry']['location']
@@ -72,11 +101,11 @@ class Program:
         self.hospital_list = tk.Listbox(self.g_Tk, width=60)
         self.hospital_list.pack(side=tk.LEFT, fill=tk.BOTH)
 
-        scrollbar = tk.Scrollbar(self.g_Tk)
-        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.scrollbar = tk.Scrollbar(self.g_Tk)
+        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
-        self.hospital_list.config(yscrollcommand=scrollbar.set)
-        scrollbar.config(command=self.hospital_list.yview)
+        self.hospital_list.config(yscrollcommand=self.scrollbar.set)
+        self.scrollbar.config(command=self.hospital_list.yview)
 
     def Graph(self):
         max_kgs_count = max(self.kgs_counts)
@@ -133,14 +162,14 @@ class Program:
         self.g_Tk = ET.fromstring(self.response.content)
         self.items = self.g_Tk.findall("row")
 
-        self.g_Tk = ThemedTk(theme="blue")
+        self.g_Tk = ThemedTk(theme="")
         self.g_Tk.title("경기도 유기동물 정보 프로그램")
         self.g_Tk.geometry("800x600+750+200")
 
         self.Google_API_Key = 'AIzaSyCzFgc9OGnXckq1-JNhSCVGo9zIq1kSWcE'
         self.gmaps = Client(key=self.Google_API_Key)
 
-        self.setupButton()
+        self.InitMain()
         self.g_Tk.mainloop()
 
 Program()
