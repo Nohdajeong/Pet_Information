@@ -14,13 +14,27 @@ from ttkthemes import ThemedTk
 class Program:
     def setupMainButton(self):
         TempFont = font.Font(self.g_Tk, size=15, weight='bold', family='Consolas')
-        self.Check = Button(self.g_Tk, text="Graph", width=6, height=1, font=TempFont,
-                            command=self.pressedCheck)
-        self.Check.place(x=400, y=70)
-
         self.Home = Button(self.g_Tk, text="Home", width=6, height=1, font=TempFont,
                            command=self.pressedHome)
-        self.Home.place(x=500, y=70)
+        self.Home.place(x=170, y=70)
+
+        self.Search = Button(self.g_Tk, text="Search", width=6, height=1, font=TempFont,
+                             command=self.pressedHome)
+        self.Search.place(x=270, y=70)
+
+        self.Graph = Button(self.g_Tk, text="Graph", width=6, height=1, font=TempFont,
+                            command=self.pressedCheck)
+        self.Graph.place(x=370, y=70)
+
+        self.Tip = Button(self.g_Tk, text="TIP", width=6, height=1, font=TempFont,
+                          command=self.pressedHome)
+        self.Tip.place(x=470, y=70)
+
+        self.Star = Button(self.g_Tk, text="★", width=6, height=1, font=TempFont,
+                           command=self.pressedHome)
+        self.Star.place(x=570, y=70)
+
+
 
     def InitNowTime(self):
         TempFont = font.Font(self.g_Tk, size=15, weight='bold', family='Consolas')
@@ -30,12 +44,31 @@ class Program:
         clock_label.pack()
         clock_label.place(x=650, y=530)
 
+    def InitSearchListBox(self):
+        ListBoxScrollbar = Scrollbar(self.g_Tk)
+        ListBoxScrollbar.pack()
+        ListBoxScrollbar.place(x=180, y=150)
+
+        TempFont = font.Font(self.g_Tk, size=15, family='Consolas')
+        SearchListBox = Listbox(self.g_Tk, font=TempFont, activestyle='none',
+                            width=10, height=3, borderwidth=12, relief='ridge',
+                            yscrollcommand=ListBoxScrollbar.set)
+
+        SearchListBox.insert(1, "강아지")
+        SearchListBox.insert(2, "고양이")
+        SearchListBox.insert(3, "기타")
+        SearchListBox.pack()
+        SearchListBox.place(x=40, y=150)
+
+        ListBoxScrollbar.config(command=SearchListBox.yview)
+
     def InitMain(self):
         TempFont = font.Font(self.g_Tk, size=20, weight='bold', family='Consolas')
         MainText = Label(self.g_Tk, font=TempFont, text="[ 경기도 동물 보호 정보 프로그램 ]")
         MainText.pack()
         MainText.place(x=200, y=15)
         self.setupMainButton()
+        self.InitSearchListBox()
         self.InitNowTime()
 
     def pressedHome(self):
@@ -85,6 +118,7 @@ class Program:
         self.si_options = set(self.hospital['address'].split()[1] for self.hospital in self.hospitals)
         self.si_combo = ttk.Combobox(self.g_Tk, textvariable=self.selected_si, values=list(self.si_options))
         self.si_combo.pack()
+        self.si_combo.place()
 
     def MapImageUpdate(self):
         # 지도 이미지 업데이트
