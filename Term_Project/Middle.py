@@ -13,14 +13,14 @@ from ttkthemes import ThemedTk
 
 class Program:
     def setupMainButton(self):
-        TempFont = font.Font(self.g_Tk, size=20, weight='bold', family='Consolas')
-        self.Check = Button(self.g_Tk, text="Check", width=6, height=1, font=TempFont,
+        TempFont = font.Font(self.g_Tk, size=15, weight='bold', family='Consolas')
+        self.Check = Button(self.g_Tk, text="Graph", width=6, height=1, font=TempFont,
                             command=self.pressedCheck)
-        self.Check.place(x=50, y=500)
+        self.Check.place(x=400, y=70)
 
         self.Home = Button(self.g_Tk, text="Home", width=6, height=1, font=TempFont,
                            command=self.pressedHome)
-        self.Home.place(x=200, y=500)
+        self.Home.place(x=500, y=70)
 
     def InitNowTime(self):
         TempFont = font.Font(self.g_Tk, size=15, weight='bold', family='Consolas')
