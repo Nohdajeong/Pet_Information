@@ -1,9 +1,10 @@
 import tkinter as tk
-import tkinter.ttk as ttk
-import io
 import requests
 import time
 import xml.etree.ElementTree as ET
+import urllib
+import urllib.request
+from io import BytesIO
 from PIL import Image, ImageTk
 from googlemaps import Client
 from tkinter import *
@@ -12,29 +13,25 @@ from tkinter import ttk
 from ttkthemes import ThemedTk
 
 class Program:
-    def setupMainButton(self):
-        TempFont = font.Font(self.g_Tk, size=15, weight='bold', family='Consolas')
-        self.Home = Button(self.g_Tk, text="Home", width=6, height=1, font=TempFont,
-                           command=self.pressedHome)
-        self.Home.place(x=170, y=70)
+    def Frame(self):
+        mylist1 = self.g_Tk.place_slaves()
+        mylist2 = self.g_Tk.pack_slaves()
+        for i in mylist1:
+            i.destroy()
+        for i in mylist2:
+            i.destroy()
 
-        self.Search = Button(self.g_Tk, text="Search", width=6, height=1, font=TempFont,
-                             command=self.pressedHome)
-        self.Search.place(x=270, y=70)
+        self.setupMainButton()
+        self.InitNowTime()
 
-        self.Graph = Button(self.g_Tk, text="Graph", width=6, height=1, font=TempFont,
-                            command=self.pressedCheck)
-        self.Graph.place(x=370, y=70)
+        TempFont = font.Font(self.g_Tk, size=20, weight='bold', family='Consolas')
+        self.MainText = Label(self.g_Tk, font=TempFont, text="[ 경기도 동물 보호 정보 프로그램 ]")
+        self.MainText.place(x=200, y=15)
 
-        self.Tip = Button(self.g_Tk, text="TIP", width=6, height=1, font=TempFont,
-                          command=self.pressedHome)
-        self.Tip.place(x=470, y=70)
-
-        self.Star = Button(self.g_Tk, text="★", width=6, height=1, font=TempFont,
-                           command=self.pressedHome)
-        self.Star.place(x=570, y=70)
-
-
+        self.photo = PhotoImage(file="Image/gif.gif")
+        self.resize = self.photo.subsample(5, 5)
+        self.imglabel = Label(self.g_Tk, image=self.resize)
+        self.imglabel.place(x=50, y=20)
 
     def InitNowTime(self):
         TempFont = font.Font(self.g_Tk, size=15, weight='bold', family='Consolas')
@@ -62,23 +59,86 @@ class Program:
 
         ListBoxScrollbar.config(command=SearchListBox.yview)
 
-    def InitMain(self):
-        TempFont = font.Font(self.g_Tk, size=20, weight='bold', family='Consolas')
-        MainText = Label(self.g_Tk, font=TempFont, text="[ 경기도 동물 보호 정보 프로그램 ]")
-        MainText.pack()
-        MainText.place(x=200, y=15)
-        self.setupMainButton()
-        self.InitSearchListBox()
-        self.InitNowTime()
+    def setupMainButton(self):
+        TempFont = font.Font(self.g_Tk, size=15, weight='bold', family='Consolas')
+        self.Home = Button(self.g_Tk, text="Home", width=6, height=1, font=TempFont,
+                           command=self.pressedHome)
+        self.Home.place(x=170, y=70)
+
+        self.Search = Button(self.g_Tk, text="Search", width=6, height=1, font=TempFont,
+                             command=self.pressedSearch)
+        self.Search.place(x=270, y=70)
+
+        self.GraphButton = Button(self.g_Tk, text="Graph", width=6, height=1, font=TempFont,
+                            command=self.pressedCheck)
+        self.GraphButton.place(x=370, y=70)
+
+        self.Tip = Button(self.g_Tk, text="TIP", width=6, height=1, font=TempFont,
+                          command=self.pressedTip)
+        self.Tip.place(x=470, y=70)
+
+        self.Star = Button(self.g_Tk, text="★", width=6, height=1, font=TempFont,
+                           command=self.pressedStar)
+        self.Star.place(x=570, y=70)
 
     def pressedHome(self):
-        self.si_combo.pack_forget()
-        self.canvas.pack_forget()
-        self.hospital_list.pack_forget()
-        self.scrollbar.pack_forget()
         self.InitMain()
 
+    def Imageview(self):
+        url = "http://www.animal.go.kr/files/shelter/2024/05/202406011306171.jpg"
+        with urllib.request.urlopen(url) as u:
+            raw_data = u.read()
+        im = Image.open(BytesIO(raw_data))
+        self.animalimg = ImageTk.PhotoImage(im)
+        Label(self.g_Tk, image=self.animalimg, height=400, width=400).pack()
+
+    def pressedSearch(self):
+        self.Frame()
+        self.Imageview()
+
+    def TextBox(self):
+        TipList = [['유기견 신고방법', '인식표나 마이크로칩을 확인 후, 확인이 된다면 곧바로 보호자에게 연락한다.'],
+                   ['마이크로칩 확인방법', '가까운 동물병원에 가면 무료로 확인이 가능하다.'],
+                   ['설명3', ''], ['설명4', ''],
+                   ['설명5', ''], ['설명6', ''],
+                   ['설명7', ''], ['설명8', '']]
+
+        RenderTextScrollbar = Scrollbar(self.g_Tk)
+        RenderTextScrollbar.pack()
+        RenderTextScrollbar.place(x=675, y=200)
+
+        TempFont = font.Font(self.g_Tk, size=10, family='Consolas')
+        RenderText = Text(self.g_Tk, width=50, height=30, borderwidth=12, relief='ridge',
+                          yscrollcommand=RenderTextScrollbar.set)
+        RenderText.pack()
+        RenderText.place(x=210, y=130)
+        RenderTextScrollbar.config(command=RenderText.yview)
+        RenderTextScrollbar.pack(side=RIGHT, fill=BOTH)
+
+        RenderText.configure(state='normal')
+        RenderText.delete(0.0, END)
+
+        for i in range(8):
+            RenderText.insert(INSERT, "[ TIP ")
+            RenderText.insert(INSERT, i + 1)
+            RenderText.insert(INSERT, ' ')
+            RenderText.insert(INSERT, TipList[i][0])
+            RenderText.insert(INSERT, " ]")
+            RenderText.insert(INSERT, '\n')
+            RenderText.insert(INSERT, TipList[i][1])
+            RenderText.insert(INSERT, '\n\n')
+
+        RenderText.configure(state='disabled')
+
+    def pressedTip(self):
+        self.Frame()
+        self.TextBox()
+
+    def pressedStar(self):
+        self.Frame()
+
     def pressedCheck(self):
+        self.Frame()
         self.InitHospitals()
         self.InitSelected()
         self.InitListBox()
@@ -92,13 +152,6 @@ class Program:
 
         self.si_combo.bind("<<ComboboxSelected>>", self.on_si_select)
         self.update_map()
-
-    def InitMapImage(self):
-        self.response = requests.get(self.si_map_url + '&key=' + self.Google_API_Key)
-        #self.image = (Image.open(io.BytesIO(self.response.content)))
-        #self.photo = ImageTk.PhotoImage(self.image)
-        #self.map_label = tk.Label(self.g_Tk, image=self.photo)
-        #self.map_label.pack()
 
     def InitHospitals(self):
         self.hospitals = []
@@ -119,6 +172,13 @@ class Program:
         self.si_combo = ttk.Combobox(self.g_Tk, textvariable=self.selected_si, values=list(self.si_options))
         self.si_combo.pack()
         self.si_combo.place()
+
+    def InitMapImage(self):
+        self.response = requests.get(self.si_map_url + '&key=' + self.Google_API_Key)
+        #self.image = (Image.open(io.BytesIO(self.response.content)))
+        #self.photo = ImageTk.PhotoImage(self.image)
+        #self.map_label = tk.Label(self.g_Tk, image=self.photo)
+        #self.map_label.pack()
 
     def MapImageUpdate(self):
         # 지도 이미지 업데이트
@@ -186,6 +246,10 @@ class Program:
 
     def on_si_select(self, event):
         self.update_map()
+
+    def InitMain(self):
+        self.Frame()
+        self.InitSearchListBox()
 
     def __init__(self):
         self.api_key = "c515978432194f9ab9d94db31ae080cf"
