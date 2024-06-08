@@ -1,16 +1,17 @@
 import tkinter as tk
+from tkinter import *
+from tkinter import font
+from tkinter import ttk
+from ttkthemes import ThemedTk
 import requests
 import time
 import xml.etree.ElementTree as ET
 import urllib
 import urllib.request
+import io
 from io import BytesIO
 from PIL import Image, ImageTk
 from googlemaps import Client
-from tkinter import *
-from tkinter import font
-from tkinter import ttk
-from ttkthemes import ThemedTk
 
 class Program:
     def Frame(self):
@@ -40,24 +41,6 @@ class Program:
         clock_label.after(1000, self.InitNowTime)
         clock_label.pack()
         clock_label.place(x=650, y=530)
-
-    def InitSearchListBox(self):
-        ListBoxScrollbar = Scrollbar(self.g_Tk)
-        ListBoxScrollbar.pack()
-        ListBoxScrollbar.place(x=180, y=150)
-
-        TempFont = font.Font(self.g_Tk, size=15, family='Consolas')
-        SearchListBox = Listbox(self.g_Tk, font=TempFont, activestyle='none',
-                            width=10, height=3, borderwidth=12, relief='ridge',
-                            yscrollcommand=ListBoxScrollbar.set)
-
-        SearchListBox.insert(1, "강아지")
-        SearchListBox.insert(2, "고양이")
-        SearchListBox.insert(3, "기타")
-        SearchListBox.pack()
-        SearchListBox.place(x=40, y=150)
-
-        ListBoxScrollbar.config(command=SearchListBox.yview)
 
     def setupMainButton(self):
         TempFont = font.Font(self.g_Tk, size=15, weight='bold', family='Consolas')
@@ -96,39 +79,41 @@ class Program:
         self.Frame()
         self.Imageview()
 
+    def InitRenderText(self):
+        self.RenderTextScrollbar = Scrollbar(self.g_Tk)
+        self.RenderTextScrollbar.pack()
+        self.RenderTextScrollbar.place(x=675, y=200)
+
+        TempFont = font.Font(self.g_Tk, size=10, family='Consolas')
+        self.RenderText = Text(self.g_Tk, width=50, height=30, borderwidth=12, relief='ridge',
+                               yscrollcommand=self.RenderTextScrollbar.set)
+        self.RenderText.pack()
+        self.RenderText.place(x=210, y=130)
+        self.RenderTextScrollbar.config(command=self.RenderText.yview)
+        self.RenderTextScrollbar.pack(side=RIGHT, fill=BOTH)
+
+        self.RenderText.configure(state='normal')
+        self.RenderText.delete(0.0, END)
+
     def TextBox(self):
+        self.InitRenderText()
         TipList = [['유기견 신고방법', '인식표나 마이크로칩을 확인 후, 확인이 된다면 곧바로 보호자에게 연락한다.'],
                    ['마이크로칩 확인방법', '가까운 동물병원에 가면 무료로 확인이 가능하다.'],
                    ['설명3', ''], ['설명4', ''],
                    ['설명5', ''], ['설명6', ''],
                    ['설명7', ''], ['설명8', '']]
 
-        RenderTextScrollbar = Scrollbar(self.g_Tk)
-        RenderTextScrollbar.pack()
-        RenderTextScrollbar.place(x=675, y=200)
-
-        TempFont = font.Font(self.g_Tk, size=10, family='Consolas')
-        RenderText = Text(self.g_Tk, width=50, height=30, borderwidth=12, relief='ridge',
-                          yscrollcommand=RenderTextScrollbar.set)
-        RenderText.pack()
-        RenderText.place(x=210, y=130)
-        RenderTextScrollbar.config(command=RenderText.yview)
-        RenderTextScrollbar.pack(side=RIGHT, fill=BOTH)
-
-        RenderText.configure(state='normal')
-        RenderText.delete(0.0, END)
-
         for i in range(8):
-            RenderText.insert(INSERT, "[ TIP ")
-            RenderText.insert(INSERT, i + 1)
-            RenderText.insert(INSERT, ' ')
-            RenderText.insert(INSERT, TipList[i][0])
-            RenderText.insert(INSERT, " ]")
-            RenderText.insert(INSERT, '\n')
-            RenderText.insert(INSERT, TipList[i][1])
-            RenderText.insert(INSERT, '\n\n')
+            self.RenderText.insert(INSERT, "[ TIP ")
+            self.RenderText.insert(INSERT, i + 1)
+            self.RenderText.insert(INSERT, ' ')
+            self.RenderText.insert(INSERT, TipList[i][0])
+            self.RenderText.insert(INSERT, " ]")
+            self.RenderText.insert(INSERT, '\n')
+            self.RenderText.insert(INSERT, TipList[i][1])
+            self.RenderText.insert(INSERT, '\n\n')
 
-        RenderText.configure(state='disabled')
+        self.RenderText.configure(state='disabled')
 
     def pressedTip(self):
         self.Frame()
@@ -161,7 +146,9 @@ class Program:
                 'address': self.item.findtext("PROTECT_PLC"),  # 보호소 주소
                 'lat': self.item.findtext("REFINE_WGS84_LAT"),  # 위도
                 'lng': self.item.findtext("REFINE_WGS84_LOGT"),  # 경도
-                'kgs': self.item.findtext("BDWGH_INFO").strip("(Kg)")  # 몸무게
+                'kgs': self.item.findtext("BDWGH_INFO").strip("(Kg)"),  # 몸무게
+                'spe': self.item.findtext("SPECIES_NM"),         # 종
+                'pro': self.item.findtext("STATE_NM")           # 보호여부
             }
             self.hospitals.append(self.hospital)
 
@@ -175,18 +162,18 @@ class Program:
 
     def InitMapImage(self):
         self.response = requests.get(self.si_map_url + '&key=' + self.Google_API_Key)
-        #self.image = (Image.open(io.BytesIO(self.response.content)))
-        #self.photo = ImageTk.PhotoImage(self.image)
-        #self.map_label = tk.Label(self.g_Tk, image=self.photo)
-        #self.map_label.pack()
+        self.image = (Image.open(io.BytesIO(self.response.content)))
+        self.photo = ImageTk.PhotoImage(self.image)
+        self.map_label = tk.Label(self.g_Tk, image=self.photo)
+        self.map_label.pack()
 
     def MapImageUpdate(self):
         # 지도 이미지 업데이트
         self.response = requests.get(self.si_map_url + '&key=' + self.Google_API_Key)
-        #self.image = Image.open(io.BytesIO(self.response.content))
-        #self.photo = ImageTk.PhotoImage(self.image)
-        #self.map_label.configure(image=self.photo)
-        #self.map_label.image = self.photo
+        self.image = Image.open(io.BytesIO(self.response.content))
+        self.photo = ImageTk.PhotoImage(self.image)
+        self.map_label.configure(image=self.photo)
+        self.map_label.image = self.photo
 
     def InitListBox(self):
         self.canvas = tk.Canvas(self.g_Tk, width=800, height=400)
@@ -247,9 +234,69 @@ class Program:
     def on_si_select(self, event):
         self.update_map()
 
+    def InitSearchListBox(self):
+        self.ANIMAL = ['개', '고양이', '기타']
+
+        self.InitHospitals()
+        ListBoxScrollbar = Scrollbar(self.g_Tk)
+        ListBoxScrollbar.pack()
+        ListBoxScrollbar.place(x=180, y=150)
+
+        TempFont = font.Font(self.g_Tk, size=15, family='Consolas')
+        self.SearchListBox = Listbox(self.g_Tk, font=TempFont, activestyle='none',
+                                width=10, height=3, borderwidth=12, relief='ridge',
+                                yscrollcommand=ListBoxScrollbar.set)
+
+        for i in range(3):
+            self.SearchListBox.insert(i+1, self.ANIMAL[i])
+
+        self.SearchListBox.pack()
+        self.SearchListBox.place(x=40, y=150)
+
+        ListBoxScrollbar.config(command=self.SearchListBox.yview)
+
+    def InitmainButton(self):
+        TempFont = font.Font(self.g_Tk, size=15, weight='bold', family='Consolas')
+        mainButton = Button(self.g_Tk, font=TempFont, text='출력', command=self.mainButtonAction)
+        mainButton.pack()
+        mainButton.place(x=40, y=300)
+
+    def mainButtonAction(self):
+        self.RenderText.configure(state='normal')
+        self.RenderText.delete(0.0, END)
+        self.ani_spe = list(self.hospital['spe'].split()[0] for self.hospital in self.hospitals)
+        self.ani_list = list(self.hospital['spe'].split()[1] for self.hospital in self.hospitals)
+
+        self.AnimalAction()
+
+    def AnimalAction(self):
+        self.InitHospitals()
+
+        self.Dogs = [Animal for Animal in self.hospitals if self.hospital['spe'].split()[0] == '[개]']
+        self.Cats = [Animal for Animal in self.hospitals if self.hospital['spe'].split()[0] == '[고양이]']
+
+        for i in range(len(self.hospitals)):
+            if self.ani_spe[i] == '[개]':
+                self.RenderText.insert(INSERT, "[")
+                self.RenderText.insert(INSERT, i + 1)
+                self.RenderText.insert(INSERT, "]")
+                self.RenderText.insert(INSERT, "종 : ")
+                self.RenderText.insert(INSERT, self.ani_list[i])
+
+            self.RenderText.insert(INSERT, "\n")
+
+
+
+
+     # SearchListBox.insert(i+1, self.ani_list[i])
+
+
     def InitMain(self):
         self.Frame()
         self.InitSearchListBox()
+        self.InitmainButton()
+        self.InitRenderText()
+
 
     def __init__(self):
         self.api_key = "c515978432194f9ab9d94db31ae080cf"
