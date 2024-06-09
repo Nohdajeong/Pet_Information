@@ -13,6 +13,13 @@ from io import BytesIO
 from PIL import Image, ImageTk
 from googlemaps import Client
 
+import mimetypes
+import smtplib
+from email.mime.base import MIMEBase
+from email.mime.text import MIMEText
+
+
+
 class Program:
     def Frame(self):
         mylist1 = self.g_Tk.place_slaves()
@@ -67,17 +74,42 @@ class Program:
     def pressedHome(self):
         self.InitMain()
 
+    def pressedSearch(self):
+        self.InitInterface()
+
+    def InitInterface(self):
+        self.window = Tk()
+        self.window.title("search")
+        self.window.geometry("800x600")
+
+        TempFont = font.Font(self.window, size=20, weight='bold', family='Consolas')
+        self.MainText = Label(self.window, font=TempFont, text="[ 세부 검색창 ]")
+        self.MainText.place(x=300, y=15)
+
+        renderTextscrollbar = Scrollbar(self.window)
+        renderTextscrollbar.pack()
+        renderTextscrollbar.place(x=675, y=200)
+
+        renderTempfont = font.Font(self.window, size=10, family='Consolas')
+        renderText = Text(self.window, width=49, height=27, borderwidth=12, relief='ridge', yscrollcommand=renderTextscrollbar.set)
+        renderText.pack()
+        renderText.place(x=210, y=135)
+
+        renderTextscrollbar.config(command=renderText.yview)
+        renderTextscrollbar.pack(side=RIGHT, fill=BOTH)
+        renderText.configure(state='normal')
+        renderText.configure(state='disabled')
+
+
+        self.window.mainloop()
+
     def Imageview(self):
         url = "http://www.animal.go.kr/files/shelter/2024/05/202406011306171.jpg"
         with urllib.request.urlopen(url) as u:
             raw_data = u.read()
         im = Image.open(BytesIO(raw_data))
         self.animalimg = ImageTk.PhotoImage(im)
-        Label(self.g_Tk, image=self.animalimg, height=400, width=400).pack()
-
-    def pressedSearch(self):
-        self.Frame()
-        self.Imageview()
+        Label(self.window, image=self.animalimg, height=400, width=400).pack()
 
     def InitRenderText(self):
         self.RenderTextScrollbar = Scrollbar(self.g_Tk)
@@ -147,14 +179,24 @@ class Program:
                 'lat': self.item.findtext("REFINE_WGS84_LAT"),  # 위도
                 'lng': self.item.findtext("REFINE_WGS84_LOGT"),  # 경도
                 'kgs': self.item.findtext("BDWGH_INFO").strip("(Kg)"),  # 몸무게
-                'spe': self.item.findtext("SPECIES_NM"),         # 종
-                'pro': self.item.findtext("STATE_NM")           # 보호여부
+                'pro': self.item.findtext("STATE_NM"),           # 보호여부
+                'info': self.item.findtext("SFETR_INFO"),
+                'sex': self.item.findtext("SEX_NM"),
+                'age': self.item.findtext("AGE_INFO"),
+                'color': self.item.findtext("COLOR_NM"),
+                'begin': self.item.findtext("PBLANC_BEGIN_DE"),
+                'end': self.item.findtext("PBLANC_END_DE"),
+                'image': self.item.findtext("IMAGE_COURS"),
+                'shter': self.item.findtext("SHTER_NM"),
+                'tel': self.item.findtext("SHTER_TELNO"),
+                'sigun': self.item.findtext("SIGUN_NM"),
+                'sigunCD': self.item.findtext("SIGUN_CD")
             }
             self.hospitals.append(self.hospital)
 
     def InitSelected(self):
         self.selected_si = tk.StringVar()
-        self.selected_si.set("평택시")
+        self.selected_si.set("김포시")
         self.si_options = set(self.hospital['address'].split()[1] for self.hospital in self.hospitals)
         self.si_combo = ttk.Combobox(self.g_Tk, textvariable=self.selected_si, values=list(self.si_options))
         self.si_combo.pack()
@@ -188,6 +230,19 @@ class Program:
         self.hospital_list.config(yscrollcommand=self.scrollbar.set)
         self.scrollbar.config(command=self.hospital_list.yview)
 
+    def show_hospitals(self):
+        self.hospital_list.delete(0, tk.END)
+
+        self.si_name = self.selected_si.get()
+        self.hospitals_in_si = [self.hospital for self.hospital in self.hospitals if self.hospital['address'].split()[1] == self.si_name]
+
+        self.hospital_names = [self.hospital['name'] for self.hospital in self.hospitals_in_si]
+        self.kgs_counts1 = [float(self.hospital['kgs']) for self.hospital in self.hospitals_in_si]
+        self.kgs_counts = [int(float(self.hospital['kgs']) * 100) for self.hospital in self.hospitals_in_si]
+
+        self.canvas.delete('all')
+        self.Graph()
+
     def Graph(self):
         max_kgs_count = max(self.kgs_counts)
         bar_width = 20
@@ -205,21 +260,9 @@ class Program:
         for hospital in self.hospitals_in_si:
             self.hospital_list.insert(tk.END, f"{hospital['name']} ({hospital['kgs']})kg")
 
-    def show_hospitals(self):
-        self.hospital_list.delete(0, tk.END)
-
-        self.si_name = self.selected_si.get()
-        self.hospitals_in_si = [self.hospital for self.hospital in self.hospitals if self.hospital['address'].split()[1] == self.si_name]
-
-        self.hospital_names = [self.hospital['name'] for self.hospital in self.hospitals_in_si]
-        self.kgs_counts1 = [float(self.hospital['kgs']) for self.hospital in self.hospitals_in_si]
-        self.kgs_counts = [int(float(self.hospital['kgs'])*100) for self.hospital in self.hospitals_in_si]
-
-        self.canvas.delete('all')
-
-        self.Graph()
 
     def update_map(self):
+
         self.hospitals_in_si = [self.hospital for self.hospital in self.hospitals if self.hospital['address'].split()[1] == self.si_name]
 
         for hospital in self.hospitals_in_si:
@@ -247,7 +290,7 @@ class Program:
                                 width=10, height=3, borderwidth=12, relief='ridge',
                                 yscrollcommand=ListBoxScrollbar.set)
 
-        for i in range(3):
+        for i in range(len(self.ANIMAL)):
             self.SearchListBox.insert(i+1, self.ANIMAL[i])
 
         self.SearchListBox.pack()
@@ -260,33 +303,86 @@ class Program:
         mainButton = Button(self.g_Tk, font=TempFont, text='출력', command=self.mainButtonAction)
         mainButton.pack()
         mainButton.place(x=40, y=300)
+        mailButton = Button(self.g_Tk, font=TempFont, text='메일', command=self.mailButtonAction)
+        mailButton.pack()
+        mailButton.place(x=100, y=300)
+
+    def mailButtonAction(self):
+        host = "smtp.gmail.com"
+        port = "587"
+        htmlFileName = "logo.html"
+
+        senderAddr = "rose20020622@gmail.com"  # 보내는 사람 email 주소.
+        recipientAddr = "dajeong0404@naver.com"  # 받는 사람 email 주소.
+
+        msg = MIMEBase("multipart", "alternative")
+        msg['Subject'] = "보호동물 정보"  # 제목
+        msg['From'] = senderAddr
+        msg['To'] = recipientAddr
+
+        htmlFD = open(htmlFileName, 'rb')
+        HtmlPart = MIMEText(htmlFD.read(), 'html', _charset='UTF-8')
+        htmlFD.close()
+
+        # 메일을 발송한다.
+        s = smtplib.SMTP(host, port)
+        # s.set_debuglevel(1)        # 디버깅이 필요할 경우 주석을 푼다.
+        s.ehlo()
+        s.starttls()
+        s.ehlo()
+        s.login("rose20020622@gmail.com", "kmvvmolsqkndseet")
+        s.sendmail(senderAddr, [recipientAddr], msg.as_string())
+        s.close()
+
 
     def mainButtonAction(self):
         self.RenderText.configure(state='normal')
         self.RenderText.delete(0.0, END)
-        self.ani_spe = list(self.hospital['spe'].split()[0] for self.hospital in self.hospitals)
-        self.ani_list = list(self.hospital['spe'].split()[1] for self.hospital in self.hospitals)
 
+        self.iSearchIndex = self.SearchListBox.curselection()[0]
         self.AnimalAction()
 
     def AnimalAction(self):
         self.InitHospitals()
-
-        self.Dogs = [Animal for Animal in self.hospitals if self.hospital['spe'].split()[0] == '[개]']
-        self.Cats = [Animal for Animal in self.hospitals if self.hospital['spe'].split()[0] == '[고양이]']
+        self.ani_set = list(self.hospital['name'].split()[0] for self.hospital in self.hospitals)
 
         for i in range(len(self.hospitals)):
-            if self.ani_spe[i] == '[개]':
-                self.RenderText.insert(INSERT, "[")
-                self.RenderText.insert(INSERT, i + 1)
-                self.RenderText.insert(INSERT, "]")
-                self.RenderText.insert(INSERT, "종 : ")
-                self.RenderText.insert(INSERT, self.ani_list[i])
-
-            self.RenderText.insert(INSERT, "\n")
-
-
-
+            if (self.iSearchIndex == 0 and self.ani_set[i] == '[개]'):
+                self.RenderText.insert(INSERT, "공고기간 : ")
+                self.RenderText.insert(INSERT, self.hospitals[i]['begin'] + "~" + self.hospitals[i]['end'])
+                self.RenderText.insert(INSERT, "\n종류 : ")
+                self.RenderText.insert(INSERT, self.hospitals[i]['name'])
+                self.RenderText.insert(INSERT, "\n성별 : ")
+                self.RenderText.insert(INSERT, self.hospitals[i]['sex'])
+                self.RenderText.insert(INSERT, "\n나이 : ")
+                self.RenderText.insert(INSERT, self.hospitals[i]['age'])
+                self.RenderText.insert(INSERT, "\n보호소명 : ")
+                self.RenderText.insert(INSERT, self.hospitals[i]['shter'])
+                self.RenderText.insert(INSERT, "\n\n")
+            elif self.iSearchIndex == 1 and self.ani_set[i] == '[고양이]':
+                self.RenderText.insert(INSERT, "공고기간 : ")
+                self.RenderText.insert(INSERT, self.hospitals[i]['begin'] + "~" + self.hospitals[i]['end'])
+                self.RenderText.insert(INSERT, "\n종류 : ")
+                self.RenderText.insert(INSERT, self.hospitals[i]['name'])
+                self.RenderText.insert(INSERT, "\n성별 : ")
+                self.RenderText.insert(INSERT, self.hospitals[i]['sex'])
+                self.RenderText.insert(INSERT, "\n나이 : ")
+                self.RenderText.insert(INSERT, self.hospitals[i]['age'])
+                self.RenderText.insert(INSERT, "\n보호소명 : ")
+                self.RenderText.insert(INSERT, self.hospitals[i]['shter'])
+                self.RenderText.insert(INSERT, "\n\n")
+            elif self.iSearchIndex == 2 and self.ani_set[i] == '[기타]':
+                self.RenderText.insert(INSERT, "공고기간 : ")
+                self.RenderText.insert(INSERT, self.hospitals[i]['begin'] + "~" + self.hospitals[i]['end'])
+                self.RenderText.insert(INSERT, "\n종류 : ")
+                self.RenderText.insert(INSERT, self.hospitals[i]['name'])
+                self.RenderText.insert(INSERT, "\n성별 : ")
+                self.RenderText.insert(INSERT, self.hospitals[i]['sex'])
+                self.RenderText.insert(INSERT, "\n나이 : ")
+                self.RenderText.insert(INSERT, self.hospitals[i]['age'])
+                self.RenderText.insert(INSERT, "\n보호소명 : ")
+                self.RenderText.insert(INSERT, self.hospitals[i]['shter'])
+                self.RenderText.insert(INSERT, "\n\n")
 
      # SearchListBox.insert(i+1, self.ani_list[i])
 
@@ -306,6 +402,9 @@ class Program:
         self.response = requests.get(self.url, params=self.params)
         self.g_Tk = ET.fromstring(self.response.content)
         self.items = self.g_Tk.findall("row")
+
+        self.window = ET.fromstring(self.response.content)
+        self.witems = self.window.findall("row")
 
         self.g_Tk = ThemedTk(theme="")
         self.g_Tk.title("경기도 유기동물 정보 프로그램")
