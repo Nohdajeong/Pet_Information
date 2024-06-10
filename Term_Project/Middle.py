@@ -85,12 +85,39 @@ class Program:
         self.MainText = Label(self.window, font=TempFont, text="[ 세부 검색창 ]")
         self.MainText.place(x=300, y=15)
 
+        self.winlistbox()
+        #self.winRendertext()
+        #self.Imageview()
+
+        self.window.mainloop()
+
+    def winlistbox(self):
+        listboxscrollbar = Scrollbar(self.window)
+        listboxscrollbar.pack()
+        listboxscrollbar.place(x=180, y=150)
+
+        TempFont = font.Font(self.window, size=12, family='Consolas')
+        listbox = Listbox(self.window, font=TempFont, activestyle='none',
+                          width=12, height=1, borderwidth=10, relief='ridge',
+                          yscrollcommand=listboxscrollbar.set)
+
+        ani_list = list(self.hospital['name'] for self.hospital in self.hospitals)
+
+        for i in range(len(self.hospitals)):
+            listbox.insert(i + 1, ani_list[i])
+
+        listbox.pack()
+        listbox.place(x=40, y=150)
+
+        listboxscrollbar.config(command=listbox.yview)
+    def winRendertext(self):
         renderTextscrollbar = Scrollbar(self.window)
         renderTextscrollbar.pack()
         renderTextscrollbar.place(x=675, y=200)
 
         renderTempfont = font.Font(self.window, size=10, family='Consolas')
-        renderText = Text(self.window, width=60, height=30, borderwidth=12, relief='ridge', yscrollcommand=renderTextscrollbar.set)
+        renderText = Text(self.window, width=60, height=30, borderwidth=12, relief='ridge',
+                          yscrollcommand=renderTextscrollbar.set)
         renderText.pack()
         renderText.place(x=210, y=135)
 
@@ -99,10 +126,6 @@ class Program:
         renderText.configure(state='normal')
         renderText.configure(state='disabled')
 
-        self.Imageview()
-
-        self.window.mainloop()
-
     def Imageview(self):
         #url = "http://www.animal.go.kr/files/shelter/2024/05/202406011306171.jpg"
         url = list(self.hospital['image'].split()[0] for self.hospital in self.hospitals)
@@ -110,7 +133,9 @@ class Program:
             raw_data = u.read()
         im = Image.open(BytesIO(raw_data))
         self.animalimg = ImageTk.PhotoImage(im)
-        Label(self.window, image=self.animalimg, height=400, width=400).pack()
+        image = Label(self.window, image=self.animalimg)
+        image.pack()
+        image.place(x=300, y=400)
 
 
     def InitRenderText(self):
@@ -377,7 +402,7 @@ class Program:
                 self.RenderText.insert(INSERT, "\n보호소명 : ")
                 self.RenderText.insert(INSERT, self.hospitals[i]['shter'])
                 self.RenderText.insert(INSERT, "\n\n")
-            elif self.iSearchIndex == 2 and self.ani_set[i] == '[기타]':
+            elif self.iSearchIndex == 2 and self.ani_set[i] == '[기타축종]':
                 self.RenderText.insert(INSERT, "공고기간 : ")
                 self.RenderText.insert(INSERT, self.hospitals[i]['begin'] + "~" + self.hospitals[i]['end'])
                 self.RenderText.insert(INSERT, "\n종류 : ")
