@@ -30,7 +30,6 @@ class Program:
             i.destroy()
 
         self.setupMainButton()
-        self.InitNowTime()
 
         TempFont = font.Font(self.g_Tk, size=20, weight='bold', family='Consolas')
         self.MainText = Label(self.g_Tk, font=TempFont, text="[ 경기도 동물 보호 정보 프로그램 ]")
@@ -196,7 +195,7 @@ class Program:
 
     def InitSelected(self):
         self.selected_si = tk.StringVar()
-        self.selected_si.set("김포시")
+        self.selected_si.set("시흥시")
         self.si_options = set(self.hospital['address'].split()[1] for self.hospital in self.hospitals)
         self.si_combo = ttk.Combobox(self.g_Tk, textvariable=self.selected_si, values=list(self.si_options))
         self.si_combo.pack()
@@ -262,6 +261,9 @@ class Program:
 
 
     def update_map(self):
+        self.si_name = self.selected_si.get()
+        self.si_center = self.gmaps.geocode(f"{self.si_name} 시")[0]['geometry']['location']
+        self.si_map_url = f"https://maps.googleapis.com/maps/api/staticmap?center={self.si_center['lat']},{self.si_center['lng']}&zoom=14&size=400x400&maptype=roadmap"
 
         self.hospitals_in_si = [self.hospital for self.hospital in self.hospitals if self.hospital['address'].split()[1] == self.si_name]
 
@@ -389,6 +391,7 @@ class Program:
 
     def InitMain(self):
         self.Frame()
+        self.InitNowTime()
         self.InitSearchListBox()
         self.InitmainButton()
         self.InitRenderText()
