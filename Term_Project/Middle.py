@@ -14,11 +14,9 @@ from PIL import Image, ImageTk
 from googlemaps import Client
 
 import mimetypes
-import smtplib
-from email.mime.base import MIMEBase
+import mysmtplib
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-
-
 
 class Program:
     def Frame(self):
@@ -86,56 +84,104 @@ class Program:
         self.MainText.place(x=300, y=15)
 
         self.winlistbox()
-        #self.winRendertext()
-        #self.Imageview()
+        self.winInitButton()
+        self.winRendertext()
 
         self.window.mainloop()
+
+    def winInitButton(self):
+        TempFont = font.Font(self.window, size=15, weight='bold', family='Consolas')
+        textButton = Button(self.window, font=TempFont, text='출력', command=self.textButtonAction)
+        textButton.pack()
+        textButton.place(x=40, y=240)
+        mailButton = Button(self.window, font=TempFont, text='메일', command=self.mailButtonAction)
+        mailButton.pack()
+        mailButton.place(x=100, y=240)
+        starButton = Button(self.window, font=TempFont, text='즐겨찾기', command=self.starButtonAction)
+        starButton.pack()
+        starButton.place(x=40, y=300)
+    def starButtonAction(self):
+        pass
+
+    def textButtonAction(self):
+        self.winiSearchIndex = self.wlistbox.curselection()[0]
+        self.renderText.configure(state='normal')
+        self.renderText.delete(0.0, END)
+
+        self.InitHospitals()
+        self.renderText.insert(INSERT, "공고기간 : ")
+        self.renderText.insert(INSERT, self.hospitals[self.winiSearchIndex]['begin'] + "~" + self.hospitals[self.winiSearchIndex]['end'])
+        self.renderText.insert(INSERT, "\n종류 : ")
+        self.renderText.insert(INSERT, self.hospitals[self.winiSearchIndex]['name'])
+        self.renderText.insert(INSERT, "\n성별 : ")
+        self.renderText.insert(INSERT, self.hospitals[self.winiSearchIndex]['sex'])
+        self.renderText.insert(INSERT, "\n나이 : ")
+        self.renderText.insert(INSERT, self.hospitals[self.winiSearchIndex]['age'])
+        self.renderText.insert(INSERT, "\n중성화 여부 : ")
+        self.renderText.insert(INSERT, self.hospitals[self.winiSearchIndex]['nuet'])
+        self.renderText.insert(INSERT, "\n색 : ")
+        self.renderText.insert(INSERT, self.hospitals[self.winiSearchIndex]['color'])
+        self.renderText.insert(INSERT, "\n특이사항 : ")
+        self.renderText.insert(INSERT, self.hospitals[self.winiSearchIndex]['info'])
+        self.renderText.insert(INSERT, "\n\n보호 여부 : ")
+        self.renderText.insert(INSERT, self.hospitals[self.winiSearchIndex]['pro'])
+        self.renderText.insert(INSERT, "\n보호소명 : ")
+        self.renderText.insert(INSERT, self.hospitals[self.winiSearchIndex]['shter'])
+        self.renderText.insert(INSERT, "\n보호소 주소 : ")
+        self.renderText.insert(INSERT, self.hospitals[self.winiSearchIndex]['address'])
+        self.renderText.insert(INSERT, "\n보호소 번호 : ")
+        self.renderText.insert(INSERT, self.hospitals[self.winiSearchIndex]['tel'])
+        self.renderText.insert(INSERT, "\n\n")
+
+        self.Imageview()
+
 
     def winlistbox(self):
         listboxscrollbar = Scrollbar(self.window)
         listboxscrollbar.pack()
-        listboxscrollbar.place(x=180, y=150)
+        listboxscrollbar.place(x=180, y=100)
 
         TempFont = font.Font(self.window, size=12, family='Consolas')
-        listbox = Listbox(self.window, font=TempFont, activestyle='none',
-                          width=12, height=1, borderwidth=10, relief='ridge',
+        self.wlistbox = Listbox(self.window, font=TempFont, activestyle='none',
+                          width=13, height=5, borderwidth=10, relief='ridge',
                           yscrollcommand=listboxscrollbar.set)
 
         ani_list = list(self.hospital['name'] for self.hospital in self.hospitals)
 
         for i in range(len(self.hospitals)):
-            listbox.insert(i + 1, ani_list[i])
+            self.wlistbox.insert(i + 1, ani_list[i])
 
-        listbox.pack()
-        listbox.place(x=40, y=150)
+        self.wlistbox.pack()
+        self.wlistbox.place(x=40, y=100)
 
-        listboxscrollbar.config(command=listbox.yview)
+        listboxscrollbar.config(command=self.wlistbox.yview)
+
     def winRendertext(self):
         renderTextscrollbar = Scrollbar(self.window)
         renderTextscrollbar.pack()
         renderTextscrollbar.place(x=675, y=200)
 
         renderTempfont = font.Font(self.window, size=10, family='Consolas')
-        renderText = Text(self.window, width=60, height=30, borderwidth=12, relief='ridge',
+        self.renderText = Text(self.window, width=40, height=30, borderwidth=12, relief='ridge',
                           yscrollcommand=renderTextscrollbar.set)
-        renderText.pack()
-        renderText.place(x=210, y=135)
+        self.renderText.pack()
+        self.renderText.place(x=210, y=100)
 
-        renderTextscrollbar.config(command=renderText.yview)
+        renderTextscrollbar.config(command=self.renderText.yview)
         renderTextscrollbar.pack(side=RIGHT, fill=BOTH)
-        renderText.configure(state='normal')
-        renderText.configure(state='disabled')
+        self.renderText.configure(state='normal')
+        self.renderText.configure(state='disabled')
 
     def Imageview(self):
         #url = "http://www.animal.go.kr/files/shelter/2024/05/202406011306171.jpg"
-        url = list(self.hospital['image'].split()[0] for self.hospital in self.hospitals)
-        with urllib.request.urlopen(url[0]) as u:
+        url = list(self.hospital['image'] for self.hospital in self.hospitals)
+        with urllib.request.urlopen(url[self.winiSearchIndex]) as u:
             raw_data = u.read()
         im = Image.open(BytesIO(raw_data))
         self.animalimg = ImageTk.PhotoImage(im)
         image = Label(self.window, image=self.animalimg)
         image.pack()
-        image.place(x=300, y=400)
+        image.place(x=570, y=150)
 
 
     def InitRenderText(self):
@@ -174,9 +220,16 @@ class Program:
 
         self.RenderText.configure(state='disabled')
 
+    def TipButton(self):
+        TempFont = font.Font(self.g_Tk, size=15, weight='bold', family='Consolas')
+        mainButton = Button(self.g_Tk, font=TempFont, text='관련 법', command=self.mainButtonAction)
+        mainButton.pack()
+        mainButton.place(x=40, y=300)
+
     def pressedTip(self):
         self.Frame()
         self.TextBox()
+        self.TipButton()
 
     def pressedStar(self):
         self.Frame()
@@ -213,12 +266,15 @@ class Program:
                 'color': self.item.findtext("COLOR_NM"),
                 'begin': self.item.findtext("PBLANC_BEGIN_DE"),
                 'end': self.item.findtext("PBLANC_END_DE"),
-                'image': self.item.findtext("IMAGE_COURS"),
+                'image': self.item.findtext("THUMB_IMAGE_COURS"),
                 'shter': self.item.findtext("SHTER_NM"),
                 'tel': self.item.findtext("SHTER_TELNO"),
                 'sigun': self.item.findtext("SIGUN_NM"),
                 'sigunCD': self.item.findtext("SIGUN_CD"),
-                'nuet': self.item.findtext("NEUT_YN")
+                'nuet': self.item.findtext("NEUT_YN"),
+                'chr': self.item.findtext("CHRGPSN_NM"),
+                'chrtel' : self.item.findtext("CHRGPSN_CONTCT_NO"),
+                'dis': self.item.findtext("DISCVRY_PLC_INFO")
             }
             self.hospitals.append(self.hospital)
 
@@ -334,34 +390,37 @@ class Program:
         mainButton = Button(self.g_Tk, font=TempFont, text='출력', command=self.mainButtonAction)
         mainButton.pack()
         mainButton.place(x=40, y=300)
-        mailButton = Button(self.g_Tk, font=TempFont, text='메일', command=self.mailButtonAction)
-        mailButton.pack()
-        mailButton.place(x=100, y=300)
 
     def mailButtonAction(self):
         host = "smtp.gmail.com"
         port = "587"
-        htmlFileName = "logo.html"
 
         senderAddr = "rose20020622@gmail.com"  # 보내는 사람 email 주소.
         recipientAddr = "dajeong0404@naver.com"  # 받는 사람 email 주소.
 
-        msg = MIMEBase("multipart", "alternative")
-        msg['Subject'] = "보호동물 정보"  # 제목
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = "경기도 보호 동물 정보"
         msg['From'] = senderAddr
         msg['To'] = recipientAddr
 
-        htmlFD = open(htmlFileName, 'rb')
-        HtmlPart = MIMEText(htmlFD.read(), 'html', _charset='UTF-8')
-        htmlFD.close()
+        msgtext = ("공고기간 : "+self.hospitals[self.winiSearchIndex]['begin'] + "~" + self.hospitals[self.winiSearchIndex]['end']+
+                   "\n종류 : "+self.hospitals[self.winiSearchIndex]['name']+"\n성별 : "+self.hospitals[self.winiSearchIndex]['sex']+
+                   "\n나이 : "+self.hospitals[self.winiSearchIndex]['age']+"\n중성화 여부 : "+self.hospitals[self.winiSearchIndex]['nuet']+
+                   "\n색 : "+self.hospitals[self.winiSearchIndex]['color']+"\n특이사항 : "+self.hospitals[self.winiSearchIndex]['info']+
+                   "\n\n보호여부 : "+self.hospitals[self.winiSearchIndex]['pro']+"\n보호소명 : "+self.hospitals[self.winiSearchIndex]['shter']+
+                   "\n보호소 주소 : "+self.hospitals[self.winiSearchIndex]['address']+"\n보호소 번호 : "+self.hospitals[self.winiSearchIndex]['tel']+
+                   "\n\n이미지 주소 : "+self.hospitals[self.winiSearchIndex]['image'])
+        msgPart = MIMEText(msgtext, 'plain')
+        msg.attach(msgPart)
 
         # 메일을 발송한다.
-        s = smtplib.SMTP(host, port)
+        s = mysmtplib.MySMTP(host, port)
         # s.set_debuglevel(1)        # 디버깅이 필요할 경우 주석을 푼다.
         s.ehlo()
         s.starttls()
         s.ehlo()
         s.login("rose20020622@gmail.com", "kmvvmolsqkndseet")
+
         s.sendmail(senderAddr, [recipientAddr], msg.as_string())
         s.close()
 
