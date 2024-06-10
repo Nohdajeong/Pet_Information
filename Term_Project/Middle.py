@@ -101,7 +101,9 @@ class Program:
         starButton.pack()
         starButton.place(x=40, y=300)
     def starButtonAction(self):
-        pass
+        self.indexpage = self.winiSearchIndex
+        self.datalist = []
+        self.datalist.append(self.indexpage)
 
     def textButtonAction(self):
         self.winiSearchIndex = self.wlistbox.curselection()[0]
@@ -133,8 +135,7 @@ class Program:
         self.renderText.insert(INSERT, self.hospitals[self.winiSearchIndex]['tel'])
         self.renderText.insert(INSERT, "\n\n")
 
-        self.Imageview()
-
+        self.Imageviewwin()
 
     def winlistbox(self):
         listboxscrollbar = Scrollbar(self.window)
@@ -172,7 +173,7 @@ class Program:
         self.renderText.configure(state='normal')
         self.renderText.configure(state='disabled')
 
-    def Imageview(self):
+    def Imageviewwin(self):
         #url = "http://www.animal.go.kr/files/shelter/2024/05/202406011306171.jpg"
         url = list(self.hospital['image'] for self.hospital in self.hospitals)
         with urllib.request.urlopen(url[self.winiSearchIndex]) as u:
@@ -183,56 +184,168 @@ class Program:
         image.pack()
         image.place(x=570, y=150)
 
-
     def InitRenderText(self):
         self.RenderTextScrollbar = Scrollbar(self.g_Tk)
         self.RenderTextScrollbar.pack()
         self.RenderTextScrollbar.place(x=675, y=200)
 
         TempFont = font.Font(self.g_Tk, size=10, family='Consolas')
-        self.RenderText = Text(self.g_Tk, width=50, height=30, borderwidth=12, relief='ridge',
+        self.RenderText = Text(self.g_Tk, width=55, height=30, borderwidth=12, relief='ridge',
                                yscrollcommand=self.RenderTextScrollbar.set)
         self.RenderText.pack()
-        self.RenderText.place(x=210, y=130)
+        self.RenderText.place(x=210, y=150)
         self.RenderTextScrollbar.config(command=self.RenderText.yview)
         self.RenderTextScrollbar.pack(side=RIGHT, fill=BOTH)
 
         self.RenderText.configure(state='normal')
         self.RenderText.delete(0.0, END)
 
-    def TextBox(self):
-        self.InitRenderText()
-        TipList = [['유기견 신고방법', '인식표나 마이크로칩을 확인 후, 확인이 된다면 곧바로 보호자에게 연락한다.'],
-                   ['마이크로칩 확인방법', '가까운 동물병원에 가면 무료로 확인이 가능하다.'],
-                   ['설명3', ''], ['설명4', ''],
-                   ['설명5', ''], ['설명6', ''],
-                   ['설명7', ''], ['설명8', '']]
+    def TipButton(self):
+        TempFont = font.Font(self.g_Tk, size=15, weight='bold', family='Consolas')
+        microButton = Button(self.g_Tk, font=TempFont, text='동물등록절차', command=self.microbuttonaction)
+        microButton.pack()
+        microButton.place(x=40, y=180)
 
-        for i in range(8):
-            self.RenderText.insert(INSERT, "[ TIP ")
-            self.RenderText.insert(INSERT, i + 1)
-            self.RenderText.insert(INSERT, ' ')
-            self.RenderText.insert(INSERT, TipList[i][0])
-            self.RenderText.insert(INSERT, " ]")
-            self.RenderText.insert(INSERT, '\n')
-            self.RenderText.insert(INSERT, TipList[i][1])
-            self.RenderText.insert(INSERT, '\n\n')
+        rowButton = Button(self.g_Tk, font=TempFont, text='동물 관련 법', command=self.rowbuttonaction)
+        rowButton.pack()
+        rowButton.place(x=40, y=230)
+
+        proButton = Button(self.g_Tk, font=TempFont, text='야생동물 구조요령', command=self.probuttonaction)
+        proButton.pack()
+        proButton.place(x=40, y=280)
+
+    def probuttonaction(self):
+        self.RenderText.configure(state='normal')
+        self.RenderText.delete(0.0, END)
+        TipList = ['야생동물 구조 요령', '1. 구조자 자신을 보호해야 합니다. 가능하면 장갑을 착용합니다. 아픈 야생동물도 갑자기 공격(물기, 할퀴기 등)을 시도할 수 있습니다.또한 사람에 옮길 수 있는 기생충(벼룩, 이, 진드기 등)이나 질병(광견병, AI등)을 갖고 있을 수 있습니다.',
+                   '2. 공기 구멍이 있는 상자를 준비 합니다. 종이상자나 애완동물용 이동장의 바닥에 부드러운 수건을 깔고 공기가 통하도록 작은 구멍들을 뚫어 줍니다. 동물의 크기보다 약간 큰 정도가 좋습니다. 철망으로 된 이동장은 새의 깃털을 손상시키고 너구리가 물어뜯으면서 상처를 입으므로 적합하지 않습니다.',
+                   '3. 구조할 동물을 수건으로 덮은 후 상자에 넣습니다. 동물의 시야를 가려주어 스트레스를 줄이고 안정되게 합니다. 또한 동물이 탈출하지 않도록 보안에 주의해야 합니다.', ' 4. 날씨가 춥거나 동물이 떨고 있으면 보온을 해야 합니다. 특히 어린 동물은 스스로 체온조절을 못하기 때문에 체온 유지는 매우 중요합니다. 데운 찜질팩이나 따뜻한 물병을 수건에 싸서 상자 구석에 깔아줍니다. 너무 뜨거워 화상을 입지 않도록 주의 해야 합니다.',
+                   '5. 짧은 시간 내에 야생동물센터로 이송한다면 물이나 먹이를 함부로 주지 말아야 합니다. 적합하지 않은 먹이는 영양 불균형으로 인해 동물을 더욱 아프게 합니다. 평소 먹는 먹이라도 쇠약한 동물에게 억지로 먹이면 기도로 넘어가거나 장에서 먹이를 소화시키지 못해 상태가 더 악화됩니다.',
+                   '6. 정확한 발견 장소를 알아두면 후에 자연으로 방생 시 중요한 정보가 됩니다.', '7. 가능한 빨리 야생동물 구조 단체에 연락합니다. 필요이상으로 동물을 장기간 집에 두지 말아야 합니다. 전문지식이 없는 부적절한 사육환경으로 폐사할 확률이 높습니다.', '8. 사체 발견 시 함부로 만지지 말아야 합니다. 특히 새가 집단 폐사한 경우, AI와 같은 전염병일 가능성이 있으므로 접촉하지 말고 해당 지역의 시군구청이나 가축위생시험소에 연락하여 사체를 수거하도록 합니다.',
+                   '9. 동물과 접촉한 후 손과 물건을 깨끗이 소독 합니다. 질병이나 기생충이 구조자 또는 애완동물에게 전파되는 것을 막기 위해 야생동물과 접촉한 모든 물건(수건, 옷, 담요, 이동장 등)도 깨끗이 씻어야 합니다.', '10. 교통사고 발생 시 사체는 도로에서 멀리 떨어진 곳에 두십시오. 사체를 먹으려고 다른 동물들이 도로 위로 모여들어 추가적인 희생을 야기 합니다.']
+
+        for i in range(len(TipList)):
+            self.RenderText.insert(INSERT, TipList[i])
+            self.RenderText.insert(INSERT, '\n\n\n')
 
         self.RenderText.configure(state='disabled')
 
-    def TipButton(self):
-        TempFont = font.Font(self.g_Tk, size=15, weight='bold', family='Consolas')
-        mainButton = Button(self.g_Tk, font=TempFont, text='관련 법', command=self.mainButtonAction)
-        mainButton.pack()
-        mainButton.place(x=40, y=300)
+    def microbuttonaction(self):
+        self.RenderText.configure(state='normal')
+        self.RenderText.delete(0.0, END)
+        TipList = [['동물등록절차안내', '1. 최초 등록시 동물등록에게 무선식별장치를 장착하기 위해 반드시 등록대상동물과 동반하여 방문신청.',
+                    '2. 지자체조례에 따라 대행업체를 통해서만 등록이 가능한 지역이 있으니 시·군·구청 등록을 원할때는 가능여부를 사전에 확인',
+                    '3.대리인이 신청할때는 위임장, 신분증 사본 등 필요 -> 등록기관에 사전연락해서 필요서류를 확인, 준비.'],
+                   ['내장형 마이크로칩 등록 방법', '1. 반려동물과 인근 동물병원 방문', '2. 소유자 인적사항 및 반려동물 정보 작성',
+                    '3. 신청 후 수일 내 승인이 완료되면 시군구청 방문해 등록증 수령']]
+        for i in range(len(TipList)):
+            self.RenderText.insert(INSERT, TipList[i][0])
+            self.RenderText.insert(INSERT, '\n\n')
+            self.RenderText.insert(INSERT, TipList[i][1])
+            self.RenderText.insert(INSERT, '\n\n')
+            self.RenderText.insert(INSERT, TipList[i][2])
+            self.RenderText.insert(INSERT, '\n\n')
+            self.RenderText.insert(INSERT, TipList[i][3])
+            self.RenderText.insert(INSERT, '\n\n\n\n')
+
+        self.RenderText.configure(state='disabled')
+
+    def rowbuttonaction(self):
+        self.RenderText.configure(state='normal')
+        self.RenderText.delete(0.0, END)
+        TipList = [['동물보호법 제16조(신고 등), 20조(동물의 소유권취득)', '①항 2인 유실·유기동물에 해당하는 동물을 발견한 때에는 동물보호센터나 지방자치 단체의 장에게 신고 할 수 있다. 또한 공고가 있는 날부터 10일이 경과하여도 소유자 등을 알 수 없는 경우에는 유실물법 제12조 및 민법 제253조의 규정에 불구하고 해당 시·군· 자치구가 그 동물의 소유권을 취득한다.', '-> 야생동물은 7일간, 주인이 있는 동물은 10일간 공고하면 지자체가 소유권을 획득 하지만 소유권을 획득한 동물이 분양되지 않으면 안락사를 시키고 있다.'],
+                   ['유실물법 제12조(준유실물)', '착오로 인하여 점유한 물건, 타인이 놓고 간 물건이나 일실한 가축에는 본법 및 민법 제253조의 규정을 준용한다. 단 착오로 인하여 점유한 물건에 대하여는 제3조의 비용과 제4조의 보상금을 청구할 수 없다.', '-> 동물보호법 제정이후 유기견은 유실물법보다 동물보호법의 적용을 받으며 시·군· 자치구 소관이다']]
+
+        for i in range(len(TipList)):
+            self.RenderText.insert(INSERT, TipList[i][0])
+            self.RenderText.insert(INSERT, '\n\n')
+            self.RenderText.insert(INSERT, TipList[i][1])
+            self.RenderText.insert(INSERT, '\n\n')
+            self.RenderText.insert(INSERT, TipList[i][2])
+            self.RenderText.insert(INSERT, '\n\n\n')
+
+        self.RenderText.configure(state='disabled')
 
     def pressedTip(self):
         self.Frame()
-        self.TextBox()
+        self.InitNowTime()
+        self.InitRenderText()
         self.TipButton()
 
     def pressedStar(self):
         self.Frame()
+        self.InitNowTime()
+        self.StarListBox()
+        self.InitRenderText()
+        self.StarButton()
+
+    def StarButton(self):
+        TempFont = font.Font(self.g_Tk, size=15, weight='bold', family='Consolas')
+        starButton = Button(self.g_Tk, font=TempFont, text='출력', command=self.StarButtonAction)
+        starButton.pack()
+        starButton.place(x=40, y=400)
+
+    def StarButtonAction(self):
+        self.index = self.starlistbox.curselection()[0]
+
+        self.RenderText.configure(state='normal')
+        self.RenderText.delete(0.0, END)
+        self.InitHospitals()
+        self.RenderText.insert(INSERT, "공고기간 : ")
+        self.RenderText.insert(INSERT, self.hospitals[self.index]['begin'] + "~" +
+                               self.hospitals[self.index]['end'])
+        self.RenderText.insert(INSERT, "\n종류 : ")
+        self.RenderText.insert(INSERT, self.hospitals[self.index]['name'])
+        self.RenderText.insert(INSERT, "\n성별 : ")
+        self.RenderText.insert(INSERT, self.hospitals[self.index]['sex'])
+        self.RenderText.insert(INSERT, "\n나이 : ")
+        self.RenderText.insert(INSERT, self.hospitals[self.index]['age'])
+        self.RenderText.insert(INSERT, "\n중성화 여부 : ")
+        self.RenderText.insert(INSERT, self.hospitals[self.index]['nuet'])
+        self.RenderText.insert(INSERT, "\n색 : ")
+        self.RenderText.insert(INSERT, self.hospitals[self.index]['color'])
+        self.RenderText.insert(INSERT, "\n특이사항 : ")
+        self.RenderText.insert(INSERT, self.hospitals[self.index]['info'])
+        self.RenderText.insert(INSERT, "\n\n보호 여부 : ")
+        self.RenderText.insert(INSERT, self.hospitals[self.index]['pro'])
+        self.RenderText.insert(INSERT, "\n보호소명 : ")
+        self.RenderText.insert(INSERT, self.hospitals[self.index]['shter'])
+        self.RenderText.insert(INSERT, "\n보호소 주소 : ")
+        self.RenderText.insert(INSERT, self.hospitals[self.index]['address'])
+        self.RenderText.insert(INSERT, "\n보호소 번호 : ")
+        self.RenderText.insert(INSERT, self.hospitals[self.index]['tel'])
+        self.RenderText.insert(INSERT, "\n\n")
+
+        self.Imageview()
+
+    def Imageview(self):
+        url = list(self.hospital['image'] for self.hospital in self.hospitals)
+        with urllib.request.urlopen(url[self.indexpage]) as u:
+            raw_data = u.read()
+        im = Image.open(BytesIO(raw_data))
+        self.animalimg = ImageTk.PhotoImage(im)
+        image = Label(self.g_Tk, image=self.animalimg)
+        image.pack()
+        image.place(x=300, y=400)
+
+    def StarListBox(self):
+        ListBoxScrollbar = Scrollbar(self.g_Tk)
+        ListBoxScrollbar.pack()
+        ListBoxScrollbar.place(x=140, y=150)
+
+        TempFont = font.Font(self.g_Tk, size=12, family='Consolas')
+        self.starlistbox = Listbox(self.g_Tk, font=TempFont, activestyle='none',
+                                     width=12, height=10, borderwidth=12, relief='ridge',
+                                     yscrollcommand=ListBoxScrollbar.set)
+
+        for i in range(len(self.datalist)):
+            self.starlistbox.insert(i + 1, self.hospitals[self.indexpage]['name'])
+
+
+        self.starlistbox.pack()
+        self.starlistbox.place(x=40, y=150)
+
+        ListBoxScrollbar.config(command=self.starlistbox.yview)
 
     def pressedCheck(self):
         self.Frame()
@@ -473,8 +586,6 @@ class Program:
                 self.RenderText.insert(INSERT, "\n보호소명 : ")
                 self.RenderText.insert(INSERT, self.hospitals[i]['shter'])
                 self.RenderText.insert(INSERT, "\n\n")
-
-     # SearchListBox.insert(i+1, self.ani_list[i])
 
 
     def InitMain(self):
