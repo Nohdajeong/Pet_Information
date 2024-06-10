@@ -77,7 +77,7 @@ class Program:
         self.InitInterface()
 
     def InitInterface(self):
-        self.window = Tk()
+        self.window = Toplevel()
         self.window.title("search")
         self.window.geometry("800x600")
 
@@ -90,7 +90,7 @@ class Program:
         renderTextscrollbar.place(x=675, y=200)
 
         renderTempfont = font.Font(self.window, size=10, family='Consolas')
-        renderText = Text(self.window, width=49, height=27, borderwidth=12, relief='ridge', yscrollcommand=renderTextscrollbar.set)
+        renderText = Text(self.window, width=60, height=30, borderwidth=12, relief='ridge', yscrollcommand=renderTextscrollbar.set)
         renderText.pack()
         renderText.place(x=210, y=135)
 
@@ -99,16 +99,19 @@ class Program:
         renderText.configure(state='normal')
         renderText.configure(state='disabled')
 
+        self.Imageview()
 
         self.window.mainloop()
 
     def Imageview(self):
-        url = "http://www.animal.go.kr/files/shelter/2024/05/202406011306171.jpg"
-        with urllib.request.urlopen(url) as u:
+        #url = "http://www.animal.go.kr/files/shelter/2024/05/202406011306171.jpg"
+        url = list(self.hospital['image'].split()[0] for self.hospital in self.hospitals)
+        with urllib.request.urlopen(url[0]) as u:
             raw_data = u.read()
         im = Image.open(BytesIO(raw_data))
         self.animalimg = ImageTk.PhotoImage(im)
         Label(self.window, image=self.animalimg, height=400, width=400).pack()
+
 
     def InitRenderText(self):
         self.RenderTextScrollbar = Scrollbar(self.g_Tk)
@@ -189,7 +192,8 @@ class Program:
                 'shter': self.item.findtext("SHTER_NM"),
                 'tel': self.item.findtext("SHTER_TELNO"),
                 'sigun': self.item.findtext("SIGUN_NM"),
-                'sigunCD': self.item.findtext("SIGUN_CD")
+                'sigunCD': self.item.findtext("SIGUN_CD"),
+                'nuet': self.item.findtext("NEUT_YN")
             }
             self.hospitals.append(self.hospital)
 
