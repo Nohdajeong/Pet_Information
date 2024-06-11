@@ -13,6 +13,8 @@ from io import BytesIO
 from PIL import Image, ImageTk
 from googlemaps import Client
 
+import telepot
+
 import mimetypes
 import mysmtplib
 from email.mime.multipart import MIMEMultipart
@@ -96,10 +98,32 @@ class Program:
         textButton.place(x=40, y=240)
         mailButton = Button(self.window, font=TempFont, text='메일', command=self.mailButtonAction)
         mailButton.pack()
-        mailButton.place(x=100, y=240)
+        mailButton.place(x=40, y=300)
         starButton = Button(self.window, font=TempFont, text='즐겨찾기', command=self.starButtonAction)
         starButton.pack()
-        starButton.place(x=40, y=300)
+        starButton.place(x=100, y=240)
+        telButton = Button(self.window, font=TempFont, text='텔레그램', command=self.telButtonAction)
+        telButton.pack()
+        telButton.place(x=100, y=300)
+
+    def telButtonAction(self):
+        bot = telepot.Bot('7458881675:AAF0LUjthMQdL6rb3blN8vMx1u51fkCfaIU')
+        bot.getMe()
+        msgtext = ("공고기간 : " + self.hospitals[self.winiSearchIndex]['begin'] + "~" +
+                   self.hospitals[self.winiSearchIndex]['end'] +
+                   "\n종류 : " + self.hospitals[self.winiSearchIndex]['name'] + "\n성별 : " +
+                   self.hospitals[self.winiSearchIndex]['sex'] +
+                   "\n나이 : " + self.hospitals[self.winiSearchIndex]['age'] + "\n중성화 여부 : " +
+                   self.hospitals[self.winiSearchIndex]['nuet'] +
+                   "\n색 : " + self.hospitals[self.winiSearchIndex]['color'] + "\n특이사항 : " +
+                   self.hospitals[self.winiSearchIndex]['info'] +
+                   "\n\n보호여부 : " + self.hospitals[self.winiSearchIndex]['pro'] + "\n보호소명 : " +
+                   self.hospitals[self.winiSearchIndex]['shter'] +
+                   "\n보호소 주소 : " + self.hospitals[self.winiSearchIndex]['address'] + "\n보호소 번호 : " +
+                   self.hospitals[self.winiSearchIndex]['tel'] +
+                   "\n\n이미지 주소 : " + self.hospitals[self.winiSearchIndex]['image'])
+        bot.sendMessage('7448723211', msgtext)
+
     def starButtonAction(self):
         self.indexpage = self.winiSearchIndex
         self.datalist = []
@@ -587,9 +611,21 @@ class Program:
                 self.RenderText.insert(INSERT, self.hospitals[i]['shter'])
                 self.RenderText.insert(INSERT, "\n\n")
 
+    def BlackMode(self):
+        self.CheckBar = IntVar()
+        c = Checkbutton(self.g_Tk, text="BlackMode", variable=self.CheckBar, command=self.blackmode)
+        c.pack()
+        c.place(x=40, y=400)
+
+    def blackmode(self):
+        if self.CheckBar.get() == 1:
+            self.g_Tk["bg"] = "black"
+        else:
+            self.g_Tk["bg"] = "white smoke"
 
     def InitMain(self):
         self.Frame()
+        self.BlackMode()
         self.InitNowTime()
         self.InitSearchListBox()
         self.InitmainButton()
@@ -611,6 +647,7 @@ class Program:
         self.g_Tk = ThemedTk(theme="")
         self.g_Tk.title("경기도 유기동물 정보 프로그램")
         self.g_Tk.geometry("800x600+750+200")
+        self.g_Tk["bg"] = "white smoke"
 
         self.Google_API_Key = 'AIzaSyCzFgc9OGnXckq1-JNhSCVGo9zIq1kSWcE'
         self.gmaps = Client(key=self.Google_API_Key)
